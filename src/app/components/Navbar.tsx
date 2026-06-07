@@ -23,7 +23,7 @@ export function Navbar({ user, cartCount, view, onNav, onLogout }: Props) {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <ShoppingBag className="w-4 h-4 text-white" />
           </div>
-          puharifea
+          PUHARIFEA
         </button>
 
         {/* Nav links */}
