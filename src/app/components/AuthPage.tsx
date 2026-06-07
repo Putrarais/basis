@@ -42,7 +42,7 @@ export function AuthPage({ onLogin }: Props) {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl shadow-lg mb-4">
             <ShoppingBag className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: 'Outfit, sans-serif' }}>TokoKu</h1>
+          <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: 'Outfit, sans-serif' }}>PUHARIFEA</h1>
           <p className="text-muted-foreground mt-1 text-sm">Platform jual beli online terpercaya</p>
         </div>
 
