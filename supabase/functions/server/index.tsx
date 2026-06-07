@@ -261,6 +261,7 @@ app.post("/make-server-c63ea027/orders", requireAuth, async (c) => {
       address: body.address,
       paymentMethod: body.paymentMethod,
       totalAmount: body.totalAmount,
+      buktiPembayaranUrl: body.buktiPembayaranUrl || null,
       status: 'pending',
       createdAt: new Date().toISOString(),
     };
@@ -359,6 +360,42 @@ app.get("/make-server-c63ea027/ratings/:productId", async (c) => {
   }
 });
 
+// SAVE PAYMENT INFO (seller)
+app.post("/make-server-c63ea027/payment-info", requireAuth, async (c) => {
+  try {
+    const userId = c.get('userId');
+    const body = await c.req.json();
+    const paymentInfo = {
+      sellerId: userId,
+      bankName: body.bankName || '',
+      bankAccount: body.bankAccount || '',
+      bankOwner: body.bankOwner || '',
+      gopay: body.gopay || '',
+      ovo: body.ovo || '',
+      dana: body.dana || '',
+      qrisUrl: body.qrisUrl || '',
+      updatedAt: new Date().toISOString(),
+    };
+    await kv.set(`payment-info:${userId}`, paymentInfo);
+    return c.json({ success: true, paymentInfo });
+  } catch (e) {
+    console.log('Save payment info error:', e);
+    return c.json({ error: String(e) }, 500);
+  }
+});
+
+// GET PAYMENT INFO (by seller ID)
+app.get("/make-server-c63ea027/payment-info/:sellerId", async (c) => {
+  try {
+    const sellerId = c.req.param('sellerId');
+    const paymentInfo = await kv.get(`payment-info:${sellerId}`);
+    if (!paymentInfo) return c.json({ error: 'Not found' }, 404);
+    return c.json(paymentInfo);
+  } catch (e) {
+    return c.json({ error: String(e) }, 500);
+  }
+});
+
 // GET ALL SELLERS (stores)
 app.get("/make-server-c63ea027/stores", async (c) => {
   try {
@@ -367,29 +404,6 @@ app.get("/make-server-c63ea027/stores", async (c) => {
     const sellerIds = [...new Set(products.filter(Boolean).map((p: any) => p.sellerId))];
     const sellers = await Promise.all(sellerIds.map(id => kv.get(`user:${id}`)));
     return c.json(sellers.filter(Boolean));
-  } catch (e) {
-    return c.json({ error: String(e) }, 500);
-  }
-});
-
-// SAVE PAYMENT INFO (seller)
-app.post("/make-server-c63ea027/payment-info", requireAuth, async (c) => {
-  try {
-    const userId = c.get('userId');
-    const body = await c.req.json();
-    await kv.set(`payment-info:${userId}`, { ...body, sellerId: userId });
-    return c.json({ success: true });
-  } catch (e) {
-    return c.json({ error: String(e) }, 500);
-  }
-});
-
-// GET PAYMENT INFO (public, by sellerId)
-app.get("/make-server-c63ea027/payment-info/:sellerId", async (c) => {
-  try {
-    const sellerId = c.req.param('sellerId');
-    const info = await kv.get(`payment-info:${sellerId}`);
-    return c.json(info || {});
   } catch (e) {
     return c.json({ error: String(e) }, 500);
   }
